@@ -3,7 +3,7 @@
 #include <Adafruit_ST7789.h>
 #include <TinyGPSPlus.h>
 #include <Arduino.h>
-
+#include <avr/dtostrf.h>
 /* Alimentazione periferiche */
 #define SOC_GPIO_PIN_T114_ADC_EN 6    // P0.06
 #define SOC_GPIO_PIN_T114_VEXT_EN 21  // P0.21  -- ATTENZIONE: vedi nota sotto
@@ -67,32 +67,81 @@ void serialSetup() {
   delay(200);
 }
 
-void setup() {
-  serialSetup();
-  setupDisplay();
-  setupGps();
+
+
+char buf[TFT_HEIGHT * TFT_WIDTH];
+#include <string.h>  // Necessario per strcmp e strcpy
+
+// Definiamo il numero massimo di righe che gestisci sullo schermo
+#define MAX_ROWS 6
+// Struttura per memorizzare lo stato dell'ultima stampa
+char lastLines[MAX_ROWS][64];
+
+// Funzione helper per ottenere l'indice del buffer in base alla coordinata Y
+int getRowIndex(int16_t y) {
+  if (y == 10) return 0;   // Ora
+  if (y == 40) return 1;   // Data UTC
+  if (y == 60) return 2;   // Satelliti
+  if (y == 80) return 3;   // Latitudine
+  if (y == 100) return 4;  // Longitudine
+  if (y == 120) return 5;  // Altitudine
+  return -1;               // Coordinata sconosciuta
 }
 
-
 void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, const char* fmt, ...) {
-  char buf[64];
+  // 1. Genera la stringa formattata nel buffer temporaneo
   va_list args;
   va_start(args, fmt);
   vsnprintf(buf, sizeof(buf), fmt, args);
   va_end(args);
+
+  // 2. Trova l'indice della riga basandoti sulla coordinata Y
+  int rowIndex = getRowIndex(cursorY);
+
+  if (rowIndex != -1) {
+    // Se il testo è IDENTICO a quello già presente sullo schermo, non fare nulla
+    if (strcmp(lastLines[rowIndex], buf) == 0) {
+      return;
+    }
+    // Altrimenti, aggiorna il testo memorizzato per la prossima volta
+    strcpy(lastLines[rowIndex], buf);
+  }
+
+  // 3. Cancella la vecchia riga sovrascrivendola con lo sfondo prima di stampare il nuovo testo
+  // Nota: Usiamo setTextColor(TESTO, SFONDO) così la libreria cancella automaticamente i vecchi pixel
+  tft.setTextColor(ST77XX_GREEN, ST77XX_BLACK);
   tft.setTextSize(size);
   tft.setCursor(cursorX, cursorY);
   tft.print(buf);
 }
 
 void drawTime() {
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setTextColor(ST77XX_GREEN);
-  drawOnTft(3, 10, 10, "%02d:%02d:%02d", gps.time.hour(), gps.time.minute(), gps.time.second());
-  drawOnTft(2, 10, 40,  "UTC: %02d/%02d/%04d", gps.date.day(), gps.date.month(), gps.date.year());
-  drawOnTft(2, 10, 60,  "Satelliti: %d", gps.satellites.value()); 
-  drawOnTft(2, 10, 80,  "Location: %d, %d", gps.location.lat(), gps.location.lng());
-  drawOnTft(2, 10, 100,  "Alt.: %d slm", gps.altitude.meters());
+  tft.startWrite();
+  // NOTA: Abbiamo RIMOSSO tft.fillScreen(ST77XX_BLACK) per evitare lo sfarfallio totale dello schermo.
+  // Lo sfondo viene aggiornato in modo mirato solo dove il testo cambia.
+
+  drawOnTft(3, 10, 10, "%02d:%02d:%02d", gps.time.hour() + 2, gps.time.minute(), gps.time.second());
+  drawOnTft(2, 10, 40, "UTC: %02d/%02d/%04d", gps.date.day(), gps.date.month(), gps.date.year());
+  drawOnTft(2, 10, 60, "Satelliti: %d", gps.satellites.value());
+
+  char latBuf[12], lngBuf[12];
+  dtostrf(gps.location.lat(), 4, 5, latBuf);
+  dtostrf(gps.location.lng(), 4, 5, lngBuf);
+
+  drawOnTft(2, 10, 80, "Lat:%s", latBuf);
+  drawOnTft(2, 10, 100, "Lon:%s", lngBuf);
+  drawOnTft(2, 10, 120, "Alt.: %d slm", gps.altitude.meters());
+
+  tft.endWrite();
+}
+
+
+
+
+void setup() {
+  serialSetup();
+  setupDisplay();
+  setupGps();
 }
 
 void loop() {
@@ -102,18 +151,9 @@ void loop() {
 
   if (millis() - lastDisplayUpdate >= 1000) {
     lastDisplayUpdate = millis();
-    Serial.print("chars: ");
-    Serial.print(gps.charsProcessed());
-    Serial.print("  sentences: ");
-    Serial.print(gps.sentencesWithFix());
-    Serial.print("  fail checksum: ");
-    Serial.println(gps.failedChecksum());
-    if (gps.time.isValid() && gps.date.isValid()) {
-      everGotFix = true;
-      drawTime();
-    } else if (!everGotFix) {
-      tft.fillScreen(ST77XX_BLACK);
-      tft.setTextColor(ST77XX_WHITE);
+
+    if (!gps.time.isValid() || !gps.date.isValid()) {
+
       tft.setTextSize(2);
       tft.setCursor(0, 0);
       tft.print("In attesa GPS...");
@@ -121,6 +161,11 @@ void loop() {
       tft.setCursor(0, 40);
       tft.print("Caratteri ricevuti: ");
       tft.print(gps.charsProcessed());
+      tft.fillScreen(ST77XX_BLACK);
+
+      return;
     }
+    everGotFix = true;
+    drawTime();
   }
 }
