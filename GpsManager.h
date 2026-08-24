@@ -8,5 +8,10 @@ extern TinyGPSPlus gps;
 
 void setupGps();
 void processGpsData();
-
+String getTimeStr();
+String getDateStr();
+String getLatStr();
+String getLonStr();
+String getAltStr();
+String getSatStr();
 #endif
