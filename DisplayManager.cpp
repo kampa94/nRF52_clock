@@ -4,29 +4,11 @@
 #include <string.h>
 #include "GpsManager.h"
 
-
 Adafruit_ST7789 tft(&SPI1, SOC_GPIO_PIN_T114_TFT_SS, SOC_GPIO_PIN_T114_TFT_DC, SOC_GPIO_PIN_T114_TFT_RST);
 
 #define MAX_ROWS 6
 static char lastLines[MAX_ROWS][64];
 static char buf[256]; // Ridotto a dimensione ragionevole invece di TFT_HEIGHT * TFT_WIDTH
-
-static int getRowIndex(int16_t y)
-{
-  if (y == 10)
-    return 0;
-  if (y == 40)
-    return 1;
-  if (y == 60)
-    return 2;
-  if (y == 80)
-    return 3;
-  if (y == 100)
-    return 4;
-  if (y == 120)
-    return 5;
-  return -1;
-}
 
 void setupDisplay()
 {
@@ -48,7 +30,6 @@ void setupDisplay()
   tft.setCursor(0, 0);
   tft.print("In attesa GPS...");
 }
-
 
 void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str)
 {
@@ -74,7 +55,6 @@ void drawTime(TinyGPSPlus &gps)
 
 void drawWaitingGPS(uint32_t charsProcessed)
 {
-  tft.fillScreen(ST77XX_BLACK);
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(2);
   tft.setCursor(0, 0);
@@ -83,4 +63,5 @@ void drawWaitingGPS(uint32_t charsProcessed)
   tft.setCursor(0, 40);
   tft.print("Caratteri ricevuti: ");
   tft.print(charsProcessed);
+  tft.fillScreen(ST77XX_BLACK);
 }

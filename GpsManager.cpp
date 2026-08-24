@@ -29,7 +29,7 @@ String getDateStr() {
 
 String getTimeStr() { 
   char buf[TFT_WIDTH];
-  snprintf(buf, sizeof(buf), "%02d:%02d", gps.time.hour(), gps.time.minute()); 
+  snprintf(buf, sizeof(buf), "%02d:%02d:%02d", gps.time.hour(), gps.time.minute(), gps.time.second()); 
   return String(buf);
 }
 
