@@ -4,13 +4,22 @@
 #include <string.h>
 #include "GpsManager.h"
 #include "Battery.h"
+#include "Screens.h"
 
 Adafruit_ST7789 tft(&SPI1, SOC_GPIO_PIN_T114_TFT_SS, SOC_GPIO_PIN_T114_TFT_DC, SOC_GPIO_PIN_T114_TFT_RST);
 
 #define MAX_ROWS 6
 static char lastLines[MAX_ROWS][64];
-static char buf[256]; // Ridotto a dimensione ragionevole invece di TFT_HEIGHT * TFT_WIDTH
+static char buf[256];
+Screens currentScreen = Screens::CLOCK;
+Screens getCurrentScreen(){
+  return currentScreen;
+}
 
+void changeScreen()
+{
+  ++currentScreen;
+}
 void setupDisplay()
 {
   digitalWrite(SOC_GPIO_PIN_T114_TFT_EN, LOW);
@@ -70,9 +79,12 @@ void drawWaitingGPS(uint32_t charsProcessed)
 void drawBattery()
 {
   tft.startWrite();
-  tft.fillScreen(ST77XX_BLACK);
 
   drawOnTft(3, 10, 10, getBatteryStr());
 
   tft.endWrite();
+}
+void cleanScreen()
+{
+  tft.fillScreen(ST77XX_BLACK);
 }

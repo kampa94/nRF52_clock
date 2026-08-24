@@ -3,15 +3,12 @@
 #include "DisplayManager.h"
 #include "GpsManager.h"
 #include "Screens.h"
+#include "ButtonManager.h"
+#include "GPS-T114.h"
 
 unsigned long lastDisplayUpdate = 0;
 
 // Debounce
-bool lastButtonState = HIGH;
-bool buttonState = HIGH;
-unsigned long lastDebounceTime = 0;
-const unsigned long debounceDelay = 50;
-Screens currentScreen = Screens::CLOCK;
 bool stillPress = true;
 void serialSetup()
 {
@@ -32,50 +29,15 @@ void setup()
   pinMode(BUTTON_PIN, INPUT_PULLUP); // pulsante attivo basso
 }
 
-bool isButtonPressed()
-{
-  bool reading = digitalRead(BUTTON_PIN);
-
-  if (reading != lastButtonState)
-  {
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay)
-  {
-    buttonState = reading;
-  }
-
-  lastButtonState = reading;
-
-  return buttonState == LOW;
-}
-void changeScreen()
-{
-  ++currentScreen;
-}
-
 void loop()
 {
   processGpsData();
 
-  if (isButtonPressed())
-  {
-    if (!stillPress)
-    {
-      changeScreen();
-      stillPress = true;
-    }
-  }
-  else
-  {
-    stillPress = false;
-  }
+  changeScreenIfButtonIsPressed();
 
-  switch (currentScreen)
+  switch (getCurrentScreen())
   {
   case Screens::CLOCK:
-
     if (millis() - lastDisplayUpdate >= 1000)
     {
       lastDisplayUpdate = millis();
@@ -100,5 +62,22 @@ void loop()
     break;
   default:
     break;
+  }
+}
+void changeScreenIfButtonIsPressed()
+{
+  if (isButtonPressed())
+  {
+    if (!stillPress)
+    {
+      cleanScreen();
+      changeScreen();
+
+      stillPress = true;
+    }
+  }
+  else
+  {
+    stillPress = false;
   }
 }
