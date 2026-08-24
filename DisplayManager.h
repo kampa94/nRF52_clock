@@ -7,7 +7,7 @@
 #include "Config.h"
 
 void setupDisplay();
-void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, const char* fmt, ...);
+void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str);
 void drawTime(TinyGPSPlus &gps);
 void drawWaitingGPS(uint32_t charsProcessed);
 
