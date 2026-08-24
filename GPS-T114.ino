@@ -2,66 +2,103 @@
 #include "Config.h"
 #include "DisplayManager.h"
 #include "GpsManager.h"
+#include "Screens.h"
 
 unsigned long lastDisplayUpdate = 0;
+
 // Debounce
 bool lastButtonState = HIGH;
 bool buttonState = HIGH;
 unsigned long lastDebounceTime = 0;
 const unsigned long debounceDelay = 50;
-
-void serialSetup() {
+Screens currentScreen = Screens::CLOCK;
+bool stillPress = true;
+void serialSetup()
+{
   Serial.begin(115200);
   unsigned long start = millis();
-  while (!Serial && (millis() - start < 3000)) { 
+  while (!Serial && (millis() - start < 3000))
+  {
     delay(10);
   }
   delay(200);
 }
 
-void setup() {
+void setup()
+{
   serialSetup();
   setupDisplay();
   setupGps();
-    pinMode(BUTTON_PIN, INPUT_PULLUP); // pulsante attivo basso
-
+  pinMode(BUTTON_PIN, INPUT_PULLUP); // pulsante attivo basso
 }
 
-bool isButtonPressed() {
+bool isButtonPressed()
+{
   bool reading = digitalRead(BUTTON_PIN);
 
-  if (reading != lastButtonState) {
+  if (reading != lastButtonState)
+  {
     lastDebounceTime = millis();
   }
 
-  if ((millis() - lastDebounceTime) > debounceDelay) {
+  if ((millis() - lastDebounceTime) > debounceDelay)
+  {
     buttonState = reading;
   }
 
   lastButtonState = reading;
 
-  return buttonState == LOW; // LOW = premuto (con INPUT_PULLUP)
+  return buttonState == LOW;
 }
-void showBlack(){
-  return;
+void changeScreen()
+{
+  ++currentScreen;
 }
 
-void loop() {
+void loop()
+{
   processGpsData();
 
-  if (isButtonPressed()) {
-    showBlack();
-    return; // salta l'aggiornamento normale finché il pulsante è premuto
+  if (isButtonPressed())
+  {
+    if (!stillPress)
+    {
+      changeScreen();
+      stillPress = true;
+    }
+  }
+  else
+  {
+    stillPress = false;
   }
 
-  if (millis() - lastDisplayUpdate >= 1000) {
-    lastDisplayUpdate = millis();
+  switch (currentScreen)
+  {
+  case Screens::CLOCK:
 
-    if (!gps.time.isValid() || !gps.date.isValid()) {
-      drawWaitingGPS(gps.charsProcessed());
-      return;
+    if (millis() - lastDisplayUpdate >= 1000)
+    {
+      lastDisplayUpdate = millis();
+
+      if (!gps.time.isValid() || !gps.date.isValid())
+      {
+        drawWaitingGPS(gps.charsProcessed());
+        return;
+      }
+
+      drawTime(gps);
     }
+    break;
 
-    drawTime(gps);
+  case Screens::BATTERY:
+     if (millis() - lastDisplayUpdate >= 1000)
+    {
+      lastDisplayUpdate = millis();
+      drawBattery();
+    }
+  
+    break;
+  default:
+    break;
   }
 }

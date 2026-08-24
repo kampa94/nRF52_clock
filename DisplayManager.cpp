@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "GpsManager.h"
+#include "Battery.h"
 
 Adafruit_ST7789 tft(&SPI1, SOC_GPIO_PIN_T114_TFT_SS, SOC_GPIO_PIN_T114_TFT_DC, SOC_GPIO_PIN_T114_TFT_RST);
 
@@ -64,4 +65,14 @@ void drawWaitingGPS(uint32_t charsProcessed)
   tft.print("Caratteri ricevuti: ");
   tft.print(charsProcessed);
   tft.fillScreen(ST77XX_BLACK);
+}
+
+void drawBattery()
+{
+  tft.startWrite();
+  tft.fillScreen(ST77XX_BLACK);
+
+  drawOnTft(3, 10, 10, getBatteryStr());
+
+  tft.endWrite();
 }
