@@ -35,49 +35,46 @@ void loop()
 
   changeScreenIfButtonIsPressed();
 
-  switch (getCurrentScreen())
+  if (millis() - lastDisplayUpdate >= 1000)
   {
-  case Screens::CLOCK:
-    if (millis() - lastDisplayUpdate >= 1000)
-    {
-      lastDisplayUpdate = millis();
+    lastDisplayUpdate = millis();
 
+    switch (currentScreen)
+    {
+    case Screens::CLOCK:
       if (!gps.time.isValid() || !gps.date.isValid())
       {
         drawWaitingGPS(gps.charsProcessed());
-        return;
       }
+      else
+      {
+        drawTime(gps);
+      }
+      break;
 
-      drawTime(gps);
-    }
-    break;
-
-  case Screens::BATTERY:
-     if (millis() - lastDisplayUpdate >= 1000)
-    {
-      lastDisplayUpdate = millis();
+    case Screens::BATTERY:
       drawBattery();
-    }
-  
-    break;
-  default:
-    break;
-  }
-}
-void changeScreenIfButtonIsPressed()
-{
-  if (isButtonPressed())
-  {
-    if (!stillPress)
-    {
-      cleanScreen();
-      changeScreen();
+      break;
 
-      stillPress = true;
+    default:
+      break;
     }
   }
-  else
+
+  void changeScreenIfButtonIsPressed()
   {
-    stillPress = false;
+    if (isButtonPressed())
+    {
+      if (!stillPress)
+      {
+        cleanScreen();
+        changeScreen();
+
+        stillPress = true;
+      }
+    }
+    else
+    {
+      stillPress = false;
+    }
   }
-}
