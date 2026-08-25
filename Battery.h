@@ -4,4 +4,5 @@
 #include "Config.h"
 String getBatteryStr();
 String getBatteryLogo();
+uint16_t getBatteryVoltage();
 #endif

@@ -73,15 +73,29 @@ void drawWaitingGPS(uint32_t charsProcessed)
   tft.print(charsProcessed);
   tft.endWrite();
 }
+void drawBatteryIcon(int x, int y, uint16_t voltage)
+{
+  const int w = 30, h = 14;
+  int pct = constrain(map(voltage, 3300, 4200, 0, 100), 0, 100);
 
+  uint16_t color = pct > 50 ? ST77XX_GREEN : (pct > 20 ? ST77XX_YELLOW : ST77XX_RED);
+
+  tft.drawRect(x, y, w, h, ST77XX_WHITE);
+  tft.fillRect(x + w, y + 3, 3, h - 6, ST77XX_WHITE);
+  int fillW = (w - 4) * pct / 100;
+  if (fillW > 0)
+    tft.fillRect(x + 2, y + 2, fillW, h - 4, color);
+}
 void drawBattery()
 {
   tft.startWrite();
 
   drawOnTft(3, 10, 10, getBatteryStr());
+  drawBatteryIcon(10, 50, getBatteryVoltage());
 
   tft.endWrite();
 }
+
 void cleanScreen()
 {
   tft.fillScreen(ST77XX_BLACK);
