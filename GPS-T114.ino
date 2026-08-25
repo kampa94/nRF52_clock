@@ -35,31 +35,32 @@ void loop()
 
   static Screens lastScreen = getCurrentScreen();
 
-  if (getCurrentScreen() != lastScreen || (millis() - lastDisplayUpdate >= 1000))
+  if (getCurrentScreen() == lastScreen && !(millis() - lastDisplayUpdate >= 1000))
   {
-    lastDisplayUpdate = millis();
-    lastScreen = getCurrentScreen();
+    return;
+  }
+  lastDisplayUpdate = millis();
+  lastScreen = getCurrentScreen();
 
-    switch (getCurrentScreen())
+  switch (getCurrentScreen())
+  {
+  case Screens::CLOCK:
+    if (!gps.time.isValid() || !gps.date.isValid())
     {
-    case Screens::CLOCK:
-      if (!gps.time.isValid() || !gps.date.isValid())
-      {
-        drawWaitingGPS(gps.charsProcessed());
-      }
-      else
-      {
-        drawTime();
-      }
-      break;
-
-    case Screens::BATTERY:
-      drawBattery();
-      break;
-
-    default:
-      break;
+      drawWaitingGPS(gps.charsProcessed());
     }
+    else
+    {
+      drawTime();
+    }
+    break;
+
+  case Screens::BATTERY:
+    drawBattery();
+    break;
+
+  default:
+    break;
   }
 }
 
