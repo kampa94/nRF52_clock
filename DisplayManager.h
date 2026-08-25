@@ -9,7 +9,7 @@
 
 void setupDisplay();
 void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str);
-void drawTime(TinyGPSPlus &gps);
+void drawTime();
 void drawWaitingGPS(uint32_t charsProcessed);
 void drawBattery();
 void cleanScreen();

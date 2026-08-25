@@ -1,5 +1,4 @@
 #include "DisplayManager.h"
-#include <avr/dtostrf.h>
 #include <stdio.h>
 #include <string.h>
 #include "GpsManager.h"
@@ -8,9 +7,9 @@
 
 Adafruit_ST7789 tft(&SPI1, SOC_GPIO_PIN_T114_TFT_SS, SOC_GPIO_PIN_T114_TFT_DC, SOC_GPIO_PIN_T114_TFT_RST);
 
-static char buf[256];
-Screens currentScreen = Screens::CLOCK;
-Screens getCurrentScreen(){
+static Screens currentScreen = Screens::CLOCK;
+Screens getCurrentScreen()
+{
   return currentScreen;
 }
 
@@ -47,7 +46,7 @@ void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str)
   tft.print(str);
 }
 
-void drawTime(TinyGPSPlus &gps)
+void drawTime()
 {
   tft.startWrite();
 
@@ -63,6 +62,7 @@ void drawTime(TinyGPSPlus &gps)
 
 void drawWaitingGPS(uint32_t charsProcessed)
 {
+  tft.startWrite();
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(2);
   tft.setCursor(0, 0);
@@ -71,6 +71,7 @@ void drawWaitingGPS(uint32_t charsProcessed)
   tft.setCursor(0, 40);
   tft.print("Caratteri ricevuti: ");
   tft.print(charsProcessed);
+  tft.endWrite();
 }
 
 void drawBattery()

@@ -1,9 +1,9 @@
 #include "Config.h"
 
-bool lastButtonState = HIGH;
-bool buttonState = HIGH;
-unsigned long lastDebounceTime = 0;
-const unsigned long debounceDelay = 50;
+static bool lastButtonState = HIGH;
+static bool buttonState = HIGH;
+static unsigned long lastDebounceTime = 0;
+static const unsigned long debounceDelay = 50;
 
 
 bool isButtonPressed()

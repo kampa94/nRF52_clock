@@ -5,7 +5,7 @@
 
 /* Alimentazione periferiche */
 #define SOC_GPIO_PIN_T114_ADC_EN 6
-#define SOC_GPIO_PIN_T114_VEXT_EN 21
+#define SOC_GPIO_PIN_T114_VEXT_EN 22
 
 /* TFT */
 #define TFT_HEIGHT 240

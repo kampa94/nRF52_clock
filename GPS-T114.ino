@@ -2,7 +2,6 @@
 #include "Config.h"
 #include "DisplayManager.h"
 #include "GpsManager.h"
-#include "DisplayManager.h"
 #include "Screens.h"
 #include "ButtonManager.h"
 #include "GPS-T114.h"
@@ -46,11 +45,12 @@ void loop()
       if (!gps.time.isValid() || !gps.date.isValid())
       {
         drawWaitingGPS(gps.charsProcessed());
+        cleanScreen();
       }
       else
       {
-        cleanScreen();
-        drawTime(gps);
+        
+        drawTime();
       }
       break;
 

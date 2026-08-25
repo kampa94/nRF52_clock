@@ -1,5 +1,7 @@
 ## INSTALLAZIONE
-Scarica ed installa arduino-cli da arduino.cc 2. Inizializza la configurazione
+Scarica ed installa arduino-cli da arduino.cc 
+
+Inizializza la configurazione
 ```sh
 arduino-cli config init --overwrite
 ```
