@@ -44,27 +44,15 @@ void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str)
 
 void drawTime()
 {
+  tft.startWrite();
 
-  if (!gps.time.isValid() || !gps.date.isValid())
-  {
-
-    tft.startWrite();
-
-    drawWaitingGPS(gps.charsProcessed());
-    tft.endWrite();
-  }
-  else
-  {
-    tft.startWrite();
-
-    drawOnTft(3, 10, 10, getTimeStr());
-    drawOnTft(2, 10, 40, getDateStr());
-    drawOnTft(2, 10, 60, getSatStr());
-    drawOnTft(2, 10, 80, getLatStr());
-    drawOnTft(2, 10, 100, getLonStr());
-    drawOnTft(2, 10, 120, getAltStr());
-    tft.endWrite();
-  }
+  drawOnTft(3, 10, 10, getTimeStr());
+  drawOnTft(2, 10, 40, getDateStr());
+  drawOnTft(2, 10, 60, getSatStr());
+  drawOnTft(2, 10, 80, getLatStr());
+  drawOnTft(2, 10, 100, getLonStr());
+  drawOnTft(2, 10, 120, getAltStr());
+  tft.endWrite();
 }
 
 void drawWaitingGPS(uint32_t charsProcessed)

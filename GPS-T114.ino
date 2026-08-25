@@ -45,14 +45,7 @@ void loop()
   switch (getCurrentScreen())
   {
   case Screens::CLOCK:
-    if (!gps.time.isValid() || !gps.date.isValid())
-    {
-      drawWaitingGPS(gps.charsProcessed());
-    }
-    else
-    {
-      drawTime();
-    }
+    drawTime();
     break;
 
   case Screens::BATTERY:
