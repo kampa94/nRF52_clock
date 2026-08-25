@@ -1,6 +1,3 @@
-#ifndef BUTTON_MANAGER_H
-#define BUTTON_MANAGER_H
-
 #include "Config.h"
 
 bool lastButtonState = HIGH;
@@ -27,4 +24,3 @@ bool isButtonPressed()
 
   return buttonState == LOW;
 }
-#endif

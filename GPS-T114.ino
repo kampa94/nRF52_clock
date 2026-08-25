@@ -2,6 +2,7 @@
 #include "Config.h"
 #include "DisplayManager.h"
 #include "GpsManager.h"
+#include "DisplayManager.h"
 #include "Screens.h"
 #include "ButtonManager.h"
 #include "GPS-T114.h"
@@ -39,7 +40,7 @@ void loop()
   {
     lastDisplayUpdate = millis();
 
-    switch (currentScreen)
+    switch (getCurrentScreen())
     {
     case Screens::CLOCK:
       if (!gps.time.isValid() || !gps.date.isValid())
@@ -48,6 +49,7 @@ void loop()
       }
       else
       {
+        cleanScreen();
         drawTime(gps);
       }
       break;
@@ -61,7 +63,9 @@ void loop()
     }
   }
 
-  void changeScreenIfButtonIsPressed()
+}
+
+void changeScreenIfButtonIsPressed()
   {
     if (isButtonPressed())
     {

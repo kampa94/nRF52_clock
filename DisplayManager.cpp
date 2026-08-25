@@ -8,8 +8,6 @@
 
 Adafruit_ST7789 tft(&SPI1, SOC_GPIO_PIN_T114_TFT_SS, SOC_GPIO_PIN_T114_TFT_DC, SOC_GPIO_PIN_T114_TFT_RST);
 
-#define MAX_ROWS 6
-static char lastLines[MAX_ROWS][64];
 static char buf[256];
 Screens currentScreen = Screens::CLOCK;
 Screens getCurrentScreen(){
@@ -22,14 +20,14 @@ void changeScreen()
 }
 void setupDisplay()
 {
-  digitalWrite(SOC_GPIO_PIN_T114_TFT_EN, LOW);
   pinMode(SOC_GPIO_PIN_T114_TFT_EN, OUTPUT);
+  digitalWrite(SOC_GPIO_PIN_T114_TFT_EN, LOW);
 
-  digitalWrite(SOC_GPIO_PIN_T114_TFT_BLGT, LOW);
   pinMode(SOC_GPIO_PIN_T114_TFT_BLGT, OUTPUT);
+  digitalWrite(SOC_GPIO_PIN_T114_TFT_BLGT, LOW);
 
-  digitalWrite(SOC_GPIO_PIN_T114_ADC_EN, HIGH);
   pinMode(SOC_GPIO_PIN_T114_ADC_EN, OUTPUT);
+  digitalWrite(SOC_GPIO_PIN_T114_ADC_EN, HIGH);
 
   tft.init(TFT_WIDTH, TFT_HEIGHT);
   tft.setRotation(3);
@@ -73,7 +71,6 @@ void drawWaitingGPS(uint32_t charsProcessed)
   tft.setCursor(0, 40);
   tft.print("Caratteri ricevuti: ");
   tft.print(charsProcessed);
-  tft.fillScreen(ST77XX_BLACK);
 }
 
 void drawBattery()
