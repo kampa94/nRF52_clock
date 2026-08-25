@@ -12,11 +12,11 @@ Screens getCurrentScreen()
 {
   return currentScreen;
 }
-
-void changeScreen()
+void nextScreen()
 {
   ++currentScreen;
 }
+
 void setupDisplay()
 {
   pinMode(SOC_GPIO_PIN_T114_TFT_EN, OUTPUT);
@@ -62,6 +62,7 @@ void drawTime()
 
 void drawWaitingGPS(uint32_t charsProcessed)
 {
+  tft.fillScreen(ST77XX_BLACK);
   tft.startWrite();
   tft.setTextColor(ST77XX_WHITE);
   tft.setTextSize(2);

@@ -2,15 +2,15 @@
 
 enum class Screens
 {
-   CLOCK,
-   BATTERY
+   CLOCK = 0,
+   BATTERY = 1
 };
 
 inline Screens &operator++(Screens &screen)
 {
    if (screen == Screens::BATTERY)
    {
-      screen = Screens::CLOCK; // Ricomincia da capo (opzionale)
+      screen = Screens::CLOCK;
       return screen;
    }
    screen = static_cast<Screens>(static_cast<int>(screen) + 1);

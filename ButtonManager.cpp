@@ -4,7 +4,7 @@ static bool lastButtonState = HIGH;
 static bool buttonState = HIGH;
 static unsigned long lastDebounceTime = 0;
 static const unsigned long debounceDelay = 50;
-
+static bool lastReportedPressed = false;
 
 bool isButtonPressed()
 {
@@ -23,4 +23,19 @@ bool isButtonPressed()
   lastButtonState = reading;
 
   return buttonState == LOW;
+}
+
+bool wasButtonJustPressed()
+{
+  bool pressed = isButtonPressed();
+  if (pressed && !lastReportedPressed)
+  {
+    lastReportedPressed = true;
+    return true;
+  }
+  if (!pressed)
+  {
+    lastReportedPressed = false;
+  }
+  return false;
 }

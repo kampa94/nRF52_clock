@@ -3,4 +3,5 @@
 
 #include "Config.h"
 bool isButtonPressed();
+bool wasButtonJustPressed();
 #endif

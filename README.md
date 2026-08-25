@@ -48,3 +48,10 @@ upload
 ```sh
 arduino-cli upload -p COM6 -b Heltec_nRF52:Heltec_nRF52:<NOME_BOARD>
 ```
+
+Shortcut per powershell
+```sh
+
+ arduino-cli compile -b Heltec_nRF52:Heltec_nRF52:HT-n5262  .; if ($?) { arduino-cli upload -p COM6 -b Heltec_nRF52:Heltec_nRF52:HT-n5262 . }; if ($?) { arduino-cli monitor -p COM6 --config baudrate=115200 };
+ 
+```

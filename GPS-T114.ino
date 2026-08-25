@@ -8,8 +8,6 @@
 
 unsigned long lastDisplayUpdate = 0;
 
-// Debounce
-bool stillPress = true;
 void serialSetup()
 {
   Serial.begin(115200);
@@ -35,9 +33,12 @@ void loop()
 
   changeScreenIfButtonIsPressed();
 
-  if (millis() - lastDisplayUpdate >= 1000)
+  static Screens lastScreen = getCurrentScreen();
+
+  if (getCurrentScreen() != lastScreen || (millis() - lastDisplayUpdate >= 1000))
   {
     lastDisplayUpdate = millis();
+    lastScreen = getCurrentScreen();
 
     switch (getCurrentScreen())
     {
@@ -45,11 +46,9 @@ void loop()
       if (!gps.time.isValid() || !gps.date.isValid())
       {
         drawWaitingGPS(gps.charsProcessed());
-        cleanScreen();
       }
       else
       {
-        
         drawTime();
       }
       break;
@@ -62,23 +61,15 @@ void loop()
       break;
     }
   }
-
 }
 
 void changeScreenIfButtonIsPressed()
+{
+  if (wasButtonJustPressed())
   {
-    if (isButtonPressed())
-    {
-      if (!stillPress)
-      {
-        cleanScreen();
-        changeScreen();
-
-        stillPress = true;
-      }
-    }
-    else
-    {
-      stillPress = false;
-    }
+    cleanScreen();
+    nextScreen();
+    Serial.println("Screen changed to: " + String(static_cast<int>(getCurrentScreen())));
+    lastDisplayUpdate = 0;
   }
+}

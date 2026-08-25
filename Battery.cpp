@@ -13,8 +13,6 @@ uint16_t getBatteryVoltage()
     adcvalue = analogRead(adcin);
     digitalWrite(PIN_BAT_ADC_CTL, 0);
     uint16_t v = (uint16_t)((float)adcvalue * mv_per_lsb * BAT_AMPLIFY);
-    Serial.printf("battry volt : %d\r\n", v);
-    delay(1000);
     return v;
 }
 

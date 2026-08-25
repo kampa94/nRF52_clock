@@ -13,6 +13,6 @@ void drawTime();
 void drawWaitingGPS(uint32_t charsProcessed);
 void drawBattery();
 void cleanScreen();
-void changeScreen();
+void nextScreen();
 Screens getCurrentScreen();
 #endif
