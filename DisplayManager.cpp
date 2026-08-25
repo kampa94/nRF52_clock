@@ -32,10 +32,6 @@ void setupDisplay()
   tft.setRotation(3);
   tft.setSPISpeed(40000000);
   tft.fillScreen(ST77XX_BLACK);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(1);
-  tft.setCursor(0, 0);
-  tft.print("In attesa GPS...");
 }
 
 void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str)
@@ -48,20 +44,32 @@ void drawOnTft(int16_t size, int16_t cursorX, int16_t cursorY, String str)
 
 void drawTime()
 {
-  tft.startWrite();
 
-  drawOnTft(3, 10, 10, getTimeStr());
-  drawOnTft(2, 10, 40, getDateStr());
-  drawOnTft(2, 10, 60, getSatStr());
-  drawOnTft(2, 10, 80, getLatStr());
-  drawOnTft(2, 10, 100, getLonStr());
-  drawOnTft(2, 10, 120, getAltStr());
+  if (!gps.time.isValid() || !gps.date.isValid())
+  {
 
-  tft.endWrite();
+    tft.startWrite();
+
+    drawWaitingGPS(gps.charsProcessed());
+    tft.endWrite();
+  }
+  else
+  {
+    tft.startWrite();
+
+    drawOnTft(3, 10, 10, getTimeStr());
+    drawOnTft(2, 10, 40, getDateStr());
+    drawOnTft(2, 10, 60, getSatStr());
+    drawOnTft(2, 10, 80, getLatStr());
+    drawOnTft(2, 10, 100, getLonStr());
+    drawOnTft(2, 10, 120, getAltStr());
+    tft.endWrite();
+  }
 }
 
 void drawWaitingGPS(uint32_t charsProcessed)
 {
+  Serial.println("Waiting for GPS signal...");
   tft.fillScreen(ST77XX_BLACK);
   tft.startWrite();
   tft.setTextColor(ST77XX_WHITE);
@@ -96,7 +104,6 @@ void drawBattery()
 
   tft.endWrite();
 }
-
 void cleanScreen()
 {
   tft.fillScreen(ST77XX_BLACK);
